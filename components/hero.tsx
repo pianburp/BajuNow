@@ -1,44 +1,51 @@
-import { NextLogo } from "./next-logo";
-import { SupabaseLogo } from "./supabase-logo";
+import Link from "next/link";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardTitle, CardContent } from "@/components/ui/card";
 
 export function Hero() {
   return (
-    <div className="flex flex-col gap-16 items-center">
-      <div className="flex gap-8 justify-center items-center">
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <SupabaseLogo />
-        </a>
-        <span className="border-l rotate-45 h-6" />
-        <a href="https://nextjs.org/" target="_blank" rel="noreferrer">
-          <NextLogo />
-        </a>
+    <section className="w-full flex flex-col-reverse lg:flex-row items-center gap-8 lg:gap-12">
+      <div className="flex-1 text-center lg:text-left">
+        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+          BajuNow — Modern, Comfortable Clothing
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
+          Discover high quality apparel for every season. Crafted from premium
+          fabrics with sustainability in mind.
+        </p>
+        <div className="mt-6 flex items-center justify-center lg:justify-start gap-3">
+          <Button asChild>
+            <Link href="/shop" className="inline-flex">Shop Now</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/collections">View Collections</Link>
+          </Button>
+        </div>
       </div>
-      <h1 className="sr-only">Supabase and Next.js Starter Template</h1>
-      <p className="text-3xl lg:text-4xl !leading-tight mx-auto max-w-xl text-center">
-        The fastest way to build apps with{" "}
-        <a
-          href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Supabase
-        </a>{" "}
-        and{" "}
-        <a
-          href="https://nextjs.org/"
-          target="_blank"
-          className="font-bold hover:underline"
-          rel="noreferrer"
-        >
-          Next.js
-        </a>
-      </p>
-      <div className="w-full p-[1px] bg-gradient-to-r from-transparent via-foreground/10 to-transparent my-8" />
-    </div>
+
+      <div className="flex-1 flex justify-center lg:justify-end">
+        <Card className="w-full max-w-md overflow-hidden fade-in-up fade-in-up-delayed-1">
+          <div className="relative aspect-[4/3] w-full rounded-md overflow-hidden flex items-end">
+            {/* Light mode background image (fallback to gradient if image missing) */}
+            <div className="absolute inset-0 block dark:hidden bg-gradient-to-r from-pink-300 via-violet-300 to-indigo-400">
+              <Image src="/images/baju.jpg" alt="Hero background" fill className="object-cover" priority />
+            </div>
+            {/* Dark mode background image (optional) */}
+            <div className="absolute inset-0 hidden dark:block bg-gradient-to-r from-pink-600 via-violet-600 to-indigo-700">
+              <Image src="/images/baju.jpg" alt="Hero background dark" fill className="object-cover" priority />
+            </div>
+            {/* Gradient overlay for improved contrast */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+            <CardContent className="p-6 text-white relative z-10">
+              <CardTitle className="text-xl">Summer Linen Shirt</CardTitle>
+              <p className="text-sm mt-1">Lightweight. Breathable. Timeless.</p>
+              <div className="mt-4 text-sm font-semibold">$49.00</div>
+            </CardContent>
+          </div>
+        </Card>
+      </div>
+    </section>
   );
 }

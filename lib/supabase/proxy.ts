@@ -44,19 +44,50 @@ export async function updateSession(request: NextRequest) {
 
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
-    return NextResponse.redirect(url);
+  const path = request.nextUrl.pathname;
+
+  // Public routes - allow access without authentication
+  const publicRoutes = ["/", "/auth/login", "/auth/sign-up", "/auth/error", "/auth/forgot-password", "/auth/sign-up-success", "/auth/update-password"];
+  const isPublicRoute = publicRoutes.some(route => path === route || path.startsWith("/auth/confirm"));
+
+  // If no user and trying to access protected route, redirect to login
+  if (!user && !isPublicRoute) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  // If user is authenticated, check role-based access
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const userRole = profile?.role || "user";
+
+    // Admin routes - only accessible to admins
+    if (path.startsWith("/admin")) {
+      if (userRole !== "admin") {
+        return NextResponse.redirect(new URL("/user", request.url));
+      }
+    }
+
+    // User routes - only accessible to regular users
+    if (path.startsWith("/user")) {
+      if (userRole !== "user") {
+        return NextResponse.redirect(new URL("/admin", request.url));
+      }
+    }
+
+    // Redirect authenticated users from login/signup to their dashboard
+    if (path === "/auth/login" || path === "/auth/sign-up") {
+      const redirectUrl = userRole === "admin" ? "/admin" : "/user";
+      return NextResponse.redirect(new URL(redirectUrl, request.url));
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
