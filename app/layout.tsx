@@ -10,6 +10,15 @@ const defaultUrl = process.env.VERCEL_URL
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: "BajuNow",
+  description: "Modern, comfortable clothing — BajuNow",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+    other: [
+      { rel: "manifest", url: "/site.webmanifest" },
+    ],
+  },
 };
 
 const geistSans = Geist({

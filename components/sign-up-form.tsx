@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function SignUpForm({
   className,
@@ -24,16 +25,37 @@ export function SignUpForm({
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const router = useRouter();
+
+  // Password requirements
+  const minLength = password.length >= 8;
+  const hasCapital = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const supabase = createClient();
     setIsLoading(true);
     setError(null);
+
+    // Validation: all fields required
+    if (!displayName || !email || !password || !repeatPassword) {
+      setError("All fields are required");
+      setIsLoading(false);
+      return;
+    }
+
+    // Password validation: min 8 chars, 1 capital, 1 number
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      setError("Password must be at least 8 characters, include 1 capital letter and 1 number");
+      setIsLoading(false);
+      return;
+    }
 
     if (password !== repeatPassword) {
       setError("Passwords do not match");
@@ -45,13 +67,11 @@ export function SignUpForm({
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
-        phone,
         options: {
           emailRedirectTo: `${window.location.origin}/user`,
           data: {
             role: "user", // Default role for new signups
             display_name: displayName,
-            phone: phone,
           },
         },
       });
@@ -63,7 +83,6 @@ export function SignUpForm({
           id: data.user.id,
           role: "user",
           display_name: displayName,
-          phone: phone,
           created_at: new Date().toISOString(),
         });
       }
@@ -109,39 +128,61 @@ export function SignUpForm({
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="e.g. +123456789"
-                  required
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                <ul className="text-xs mt-2 space-y-1">
+                  <li className={minLength ? "text-green-500" : "text-muted-foreground"}>
+                    {minLength ? "✔" : "○"} At least 8 characters
+                  </li>
+                  <li className={hasCapital ? "text-green-500" : "text-muted-foreground"}>
+                    {hasCapital ? "✔" : "○"} At least 1 capital letter
+                  </li>
+                  <li className={hasNumber ? "text-green-500" : "text-muted-foreground"}>
+                    {hasNumber ? "✔" : "○"} At least 1 number
+                  </li>
+                </ul>
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <Label htmlFor="repeat-password">Repeat Password</Label>
                 </div>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="repeat-password"
+                    type={showRepeatPassword ? "text" : "password"}
+                    required
+                    value={repeatPassword}
+                    onChange={(e) => setRepeatPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    onClick={() => setShowRepeatPassword((v) => !v)}
+                    aria-label={showRepeatPassword ? "Hide password" : "Show password"}
+                  >
+                    {showRepeatPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>

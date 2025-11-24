@@ -1,46 +1,178 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { createClient } from "@/lib/supabase/server";
-import { LogoutButton } from "./logout-button";
 import { Badge } from "./ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Menu, LogOut, ShoppingCart, Package, LayoutDashboard, Shirt, Settings, FileText } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export async function AuthButton() {
-  const supabase = await createClient();
+export function AuthButton() {
+  const [user, setUser] = useState<any>(null);
+  const [userRole, setUserRole] = useState<string>("user");
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
 
-  const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
 
-  if (!user) {
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+        setUserRole(profile?.role || "user");
+      }
+      setIsLoading(false);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", session.user.id)
+          .single()
+          .then(({ data }) => setUserRole(data?.role || "user"));
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [supabase]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
+
+  if (isLoading) {
     return (
-      <div className="flex gap-2">
-        <Button asChild size="sm" variant={"outline"}>
-          <Link href="/auth/login">Sign in</Link>
-        </Button>
-        <Button asChild size="sm" variant={"default"}>
-          <Link href="/auth/sign-up">Shop Now</Link>
-        </Button>
-      </div>
+      <Button size="sm" variant="outline" disabled>
+        <Menu className="w-4 h-4" />
+      </Button>
     );
   }
 
-  // Get user role
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.sub)
-    .single();
-
-  const userRole = profile?.role || "user";
+  if (!user) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="sm" variant="outline">
+            <Menu className="w-4 h-4 mr-2" />
+            Menu
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuItem asChild>
+            <Link href="/user" className="cursor-pointer">
+              <Shirt className="w-4 h-4 mr-2" />
+              Browse Shirts
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/auth/login" className="cursor-pointer">
+              Sign in
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link href="/auth/sign-up" className="cursor-pointer font-semibold">
+              Shop Now
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex flex-col items-end gap-1">
-        <span className="text-sm">{user.email}</span>
-        <Badge variant={userRole === "admin" ? "destructive" : "secondary"} className="text-xs">
-          {userRole === "admin" ? "Admin" : "User"}
-        </Badge>
-      </div>
-      <LogoutButton />
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" variant="outline">
+          <Menu className="w-4 h-4 mr-2" />
+          <span className="hidden sm:inline">{user.email}</span>
+          <Badge variant={userRole === "admin" ? "destructive" : "secondary"} className="text-xs ml-2">
+            {userRole === "admin" ? "Admin" : "User"}
+          </Badge>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuLabel>
+          <div className="flex flex-col">
+            <span className="text-sm font-semibold">{user.email}</span>
+            <span className="text-xs text-muted-foreground">{userRole === "admin" ? "Administrator" : "Customer"}</span>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/user" className="cursor-pointer">
+            <Shirt className="w-4 h-4 mr-2" />
+            Browse Shirts
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/user/cart" className="cursor-pointer">
+            <ShoppingCart className="w-4 h-4 mr-2" />
+            Cart
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/user/orders" className="cursor-pointer">
+            <Package className="w-4 h-4 mr-2" />
+            My Orders
+          </Link>
+        </DropdownMenuItem>
+        {userRole === "admin" && (
+          <>
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="cursor-pointer">
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Admin Dashboard
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/products" className="cursor-pointer">
+                <Shirt className="w-4 h-4 mr-2" />
+                Products
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/orders" className="cursor-pointer">
+                <FileText className="w-4 h-4 mr-2" />
+                Orders
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/admin/settings" className="cursor-pointer">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+          <LogOut className="w-4 h-4 mr-2" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

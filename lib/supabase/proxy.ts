@@ -17,7 +17,7 @@ export async function updateSession(request: NextRequest) {
   // variable. Always create a new one on each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -61,25 +61,20 @@ export async function updateSession(request: NextRequest) {
 
   // If user is authenticated, check role-based access
   if (user) {
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
+    console.log("Profile query result:", { profile, error, userId: user.id });
+    
     const userRole = profile?.role || "user";
 
     // Admin routes - only accessible to admins
     if (path.startsWith("/admin")) {
       if (userRole !== "admin") {
         return NextResponse.redirect(new URL("/user", request.url));
-      }
-    }
-
-    // User routes - only accessible to regular users
-    if (path.startsWith("/user")) {
-      if (userRole !== "user") {
-        return NextResponse.redirect(new URL("/admin", request.url));
       }
     }
 

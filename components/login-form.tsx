@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -24,6 +25,7 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -32,20 +34,27 @@ export function LoginForm({
     setIsLoading(true);
     setError(null);
 
+    // Validation: all fields required
+    if (!email || !password) {
+      setError("All fields are required");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) throw error;
-      
+
       // Get user role and redirect accordingly
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", data.user?.id)
         .single();
-      
+
       const userRole = profile?.role || "user";
       const redirectUrl = userRole === "admin" ? "/admin" : "/user";
       router.push(redirectUrl);
@@ -90,13 +99,24 @@ export function LoginForm({
                     Forgot your password?
                   </Link>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
+                    onClick={() => setShowPassword((v) => !v)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>

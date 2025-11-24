@@ -1,15 +1,8 @@
-import { getUserProfile, requireAdmin } from "@/lib/rbac";
-import { redirect } from "next/navigation";
+import { getUserProfile } from "@/lib/rbac";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShirtIcon, PackageIcon, DollarSignIcon, UsersIcon } from "lucide-react";
 
 export default async function AdminDashboard() {
-  try {
-    await requireAdmin();
-  } catch {
-    redirect("/user");
-  }
-
   const profile = await getUserProfile();
 
   return (

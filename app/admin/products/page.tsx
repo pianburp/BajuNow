@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShirtIcon, PlusIcon } from "lucide-react";
+import Link from "next/link";
 
 export default async function ProductsPage() {
   try {
@@ -20,10 +21,12 @@ export default async function ProductsPage() {
             Manage your shirt inventory and pricing
           </p>
         </div>
-        <Button>
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+        <Link href="/admin/products/add">
+          <Button>
+            <PlusIcon className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+        </Link>
       </div>
 
       <Card>
@@ -45,7 +48,9 @@ export default async function ProductsPage() {
                   <p className="text-sm text-muted-foreground">{50 - i * 5} in stock</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+                  <Link href={`/admin/products/${i}/edit`}>
+                    <Button variant="outline" size="sm" className="flex-1">Edit</Button>
+                  </Link>
                   <Button variant="destructive" size="sm" className="flex-1">Delete</Button>
                 </div>
               </div>

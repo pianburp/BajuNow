@@ -1,5 +1,4 @@
 import { getUserProfile } from "@/lib/rbac";
-import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShirtIcon, ShoppingCartIcon, PackageIcon } from "lucide-react";
 import Link from "next/link";
@@ -7,16 +6,12 @@ import Link from "next/link";
 export default async function UserDashboard() {
   const profile = await getUserProfile();
 
-  if (!profile) {
-    redirect("/auth/login");
-  }
-
   return (
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Welcome to BajuNow!</h1>
         <p className="text-muted-foreground">
-          Hi {profile.email}, browse our collection of premium shirts
+          Hi {profile?.email}, browse our collection of premium shirts
         </p>
       </div>
 
