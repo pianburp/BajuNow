@@ -65,16 +65,18 @@ export function Features() {
               style={{ y: yTransforms[idx] }}
             >
               {/* Media Content */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-muted/30 border border-border/50 group-hover:border-border transition-colors duration-300">
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-800 border border-border/50 group-hover:border-border transition-colors duration-300">
                  {feature.mediaType === 'video' ? (
                    <video
                      autoPlay
                      loop
                      muted
                      playsInline
-                     className="absolute inset-0 w-full h-full object-cover"
+                     preload="auto"
+                     className="absolute inset-0 w-full h-full object-cover z-0"
                    >
                      <source src={feature.src} type="video/mp4" />
+                     Your browser does not support the video tag.
                    </video>
                  ) : (
                    <Image 

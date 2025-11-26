@@ -5,20 +5,22 @@ import { Card, CardTitle, CardContent } from "@/components/ui/card";
 
 export function Hero() {
   return (
-    <section className="relative w-full h-screen flex items-center overflow-hidden">
+    <section className="relative w-full h-screen flex items-center overflow-hidden bg-neutral-900">
       {/* Background Video */}
       <video
         autoPlay
         loop
         muted
         playsInline
-        className="absolute inset-0 w-full h-full object-cover"
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover z-0"
       >
         <source src="/video/hero.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
       </video>
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/50 z-[1]" />
 
       <div className="relative z-10 container mx-auto px-4 flex flex-col-reverse lg:flex-row items-center gap-8 lg:gap-12">
         <div className="flex-1 text-center lg:text-left text-white fade-in-up">
