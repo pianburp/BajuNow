@@ -23,7 +23,7 @@ export default async function UserDashboard(props: {
   // Fetch featured products for the hero section
   const { data: featuredProducts } = await supabase
     .from('products')
-    .select('*, product_images(storage_path)')
+    .select('*, product_images(storage_path), product_variants(stock_quantity)')
     .eq('featured', true)
     .eq('is_active', true)
     .limit(3);
@@ -31,7 +31,7 @@ export default async function UserDashboard(props: {
   // Build query for all products
   let query = supabase
     .from('products')
-    .select('*, product_images(storage_path)')
+    .select('*, product_images(storage_path), product_variants(stock_quantity)')
     .eq('is_active', true)
     .order('created_at', { ascending: false });
 
@@ -136,6 +136,8 @@ function ProductCard({ product, supabase, featured = false }: { product: any, su
     ? supabase.storage.from('product-images').getPublicUrl(imagePath).data.publicUrl 
     : null;
 
+  const isLowStock = product.product_variants?.some((v: any) => v.stock_quantity < 25);
+
   return (
     <Card className={`flex flex-col h-full group overflow-hidden border-muted transition-all duration-300 hover:shadow-lg ${featured ? 'border-primary/20 bg-primary/5' : ''}`}>
       <div className="relative aspect-[4/5] bg-muted overflow-hidden">
@@ -153,6 +155,11 @@ function ProductCard({ product, supabase, featured = false }: { product: any, su
         {featured && (
           <Badge className="absolute top-3 right-3 bg-yellow-500 hover:bg-yellow-600 text-white border-none">
             Featured
+          </Badge>
+        )}
+        {isLowStock && (
+          <Badge className={`absolute top-3 ${featured ? 'left-3' : 'right-3'} bg-orange-500 hover:bg-orange-600 text-white border-none`}>
+            Low Stock
           </Badge>
         )}
       </div>

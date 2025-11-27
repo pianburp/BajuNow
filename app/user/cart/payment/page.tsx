@@ -2,6 +2,7 @@ import { getUserProfile } from "@/lib/rbac";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PaymentClient from "./payment-client";
+import { getActiveCoupons } from "./actions";
 
 export default async function PaymentPage() {
   const profile = await getUserProfile();
@@ -59,5 +60,7 @@ export default async function PaymentPage() {
     };
   }) || [];
 
-  return <PaymentClient cartItems={cartItems} userEmail={profile.email} />;
+  const coupons = await getActiveCoupons();
+
+  return <PaymentClient cartItems={cartItems} userEmail={profile.email} initialCoupons={coupons} />;
 }

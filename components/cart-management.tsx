@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CartItemComponent } from "./cart-item";
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 
 interface CartItem {
   id: string;
+  productId: string;
   name: string;
   price: number;
   size: string;
@@ -20,22 +23,71 @@ interface CartItem {
 
 interface CartManagementProps {
   initialItems: CartItem[];
+  userId: string;
 }
 
-export function CartManagement({ initialItems }: CartManagementProps) {
+export function CartManagement({ initialItems, userId }: CartManagementProps) {
   const [cartItems, setCartItems] = useState<CartItem[]>(initialItems);
   const [couponCode, setCouponCode] = useState("");
+  const router = useRouter();
+  const supabase = createClient();
 
-  const handleQuantityChange = (id: string, quantity: number) => {
+  useEffect(() => {
+    setCartItems(initialItems);
+  }, [initialItems]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('cart_updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'cart_items',
+          filter: `user_id=eq.${userId}`,
+        },
+        () => {
+          router.refresh();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase, router, userId]);
+
+  const handleQuantityChange = async (id: string, quantity: number) => {
+    // Optimistic update
     setCartItems(items => 
       items.map(item => 
         item.id === id ? { ...item, quantity } : item
       )
     );
+
+    const { error } = await supabase
+      .from('cart_items')
+      .update({ quantity })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating quantity:', error);
+    }
   };
 
-  const handleRemoveItem = (id: string) => {
+  const handleRemoveItem = async (id: string) => {
+    // Optimistic update
     setCartItems(items => items.filter(item => item.id !== id));
+
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error removing item:', error);
+    }
   };
 
   const handleApplyCoupon = () => {

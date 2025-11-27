@@ -122,6 +122,7 @@ export default async function ProductsPage() {
               {products.map((product) => {
                 // Calculate total stock
                 const totalStock = product.product_variants?.reduce((sum: number, v: any) => sum + (v.stock_quantity || 0), 0) || 0;
+                const hasLowStock = product.product_variants?.some((v: any) => (v.stock_quantity || 0) < 25);
                 
                 // Get primary image or first image
                 const primaryImage = product.product_images?.find((img: any) => img.is_primary) || product.product_images?.[0];
@@ -149,6 +150,11 @@ export default async function ProductsPage() {
                       {product.featured && (
                         <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
                           Featured
+                        </div>
+                      )}
+                      {hasLowStock && product.is_active && (
+                        <div className="absolute bottom-2 right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded shadow-sm">
+                          Low Stock
                         </div>
                       )}
                     </div>

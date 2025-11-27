@@ -22,6 +22,7 @@ export default async function CartPage() {
         color,
         price,
         products (
+          id,
           name,
           product_images (
             storage_path,
@@ -50,6 +51,7 @@ export default async function CartPage() {
 
     return {
       id: item.id,
+      productId: product.id,
       name: product.name,
       price: Number(variant.price),
       size: variant.size,
@@ -68,7 +70,7 @@ export default async function CartPage() {
         </p>
       </div>
 
-      <CartManagement initialItems={cartItems} />
+      <CartManagement initialItems={cartItems} userId={profile.id} />
     </div>
   );
 }

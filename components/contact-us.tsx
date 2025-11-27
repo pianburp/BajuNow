@@ -58,7 +58,7 @@ export function ContactUs() {
               <div>
                 <h3 className="text-xl font-semibold mb-2">Visit Us</h3>
                 <p className="text-muted-foreground mb-2">
-                  Come say hello at our office.
+                  Come shop at our store.
                 </p>
                 <address className="text-lg font-medium not-italic">
                   123 Jalan Bukit Bintang<br />

@@ -4,9 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Minus, Trash2, ShirtIcon } from "lucide-react";
+import Link from "next/link";
 
 interface CartItem {
   id: string;
+  productId: string;
   name: string;
   price: number;
   size: string;
@@ -37,20 +39,24 @@ export function CartItemComponent({ item, onQuantityChange, onRemove }: CartItem
 
   return (
     <div className="flex items-center gap-4 p-4 border rounded-lg">
-      <div className="w-20 h-20 bg-muted rounded-md flex items-center justify-center flex-shrink-0 overflow-hidden">
-        {item.image ? (
-          <img 
-            src={item.image} 
-            alt={item.name} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <ShirtIcon className="w-8 h-8 text-muted-foreground" />
-        )}
-      </div>
+      <Link href={`/user/products/${item.productId}`} className="flex-shrink-0">
+        <div className="w-20 h-20 bg-muted rounded-md flex items-center justify-center overflow-hidden hover:opacity-80 transition-opacity">
+          {item.image ? (
+            <img 
+              src={item.image} 
+              alt={item.name} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <ShirtIcon className="w-8 h-8 text-muted-foreground" />
+          )}
+        </div>
+      </Link>
       
       <div className="flex-1">
-        <h3 className="font-semibold">{item.name}</h3>
+        <Link href={`/user/products/${item.productId}`} className="hover:underline">
+          <h3 className="font-semibold">{item.name}</h3>
+        </Link>
         <p className="text-sm text-muted-foreground">
           Size: {item.size} • Color: {item.color}
         </p>

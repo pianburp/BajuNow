@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,12 +30,21 @@ interface CartItem {
   image: string;
 }
 
+interface Coupon {
+  id: string;
+  code: string;
+  discount_type: 'percentage' | 'fixed' | 'shipping';
+  discount_value: number;
+  description?: string;
+}
+
 interface PaymentClientProps {
   cartItems: CartItem[];
   userEmail: string;
+  initialCoupons: Coupon[];
 }
 
-export default function PaymentClient({ cartItems, userEmail }: PaymentClientProps) {
+export default function PaymentClient({ cartItems, userEmail, initialCoupons }: PaymentClientProps) {
   const [selectedCoupon, setSelectedCoupon] = useState("");
   const [customCoupon, setCustomCoupon] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("card");
@@ -47,14 +56,92 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
     cvc: "",
     name: ""
   });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [cardType, setCardType] = useState<string | null>(null);
   const router = useRouter();
 
-  const availableCoupons = [
-    { code: "SAVE10", discount: 10, type: "percentage", description: "10% off your order" },
-    { code: "NEWUSER", discount: 15, type: "percentage", description: "15% off for new customers" },
-    { code: "SAVE5", discount: 5, type: "fixed", description: "RM5 off your order" },
-    { code: "FREESHIP", discount: 9.99, type: "shipping", description: "Free shipping" }
-  ];
+  const detectCardType = (number: string) => {
+    const cleanNum = number.replace(/\s/g, "");
+    if (/^4/.test(cleanNum)) return "visa";
+    if (/^5[1-5]/.test(cleanNum)) return "mastercard";
+    if (/^3[47]/.test(cleanNum)) return "amex";
+    return null;
+  };
+
+  const validateCardNumber = (number: string) => {
+    const cleanNum = number.replace(/\s/g, "");
+    
+    // Strict patterns for validation
+    const patterns = {
+      visa: /^4[0-9]{12}(?:[0-9]{3})?$/,
+      mastercard: /^5[1-5][0-9]{14}$/,
+      amex: /^3[47][0-9]{13}$/
+    };
+
+    if (patterns.visa.test(cleanNum)) return "visa";
+    if (patterns.mastercard.test(cleanNum)) return "mastercard";
+    if (patterns.amex.test(cleanNum)) return "amex";
+    
+    return null;
+  };
+
+  const validateDate = (date: string) => {
+    if (!/^\d{2}\/\d{2}$/.test(date)) return false;
+    const [month, year] = date.split('/').map(Number);
+    if (month < 1 || month > 12) return false;
+    
+    const now = new Date();
+    const currentYear = parseInt(now.getFullYear().toString().slice(-2));
+    const currentMonth = now.getMonth() + 1;
+
+    if (year < currentYear) return false;
+    if (year === currentYear && month < currentMonth) return false;
+    
+    return true;
+  };
+
+  const validateCVV = (cvv: string, type: string | null) => {
+    const cleanCVV = cvv.replace(/\s/g, "");
+    if (type === "amex") {
+      return /^\d{4}$/.test(cleanCVV);
+    }
+    return /^\d{3}$/.test(cleanCVV);
+  };
+
+  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove all non-digits
+    let value = e.target.value.replace(/\D/g, "");
+    
+    // Detect type for formatting limits
+    const type = detectCardType(value);
+    
+    // Limit length based on type
+    const maxLength = type === "amex" ? 15 : 16;
+    value = value.slice(0, maxLength);
+
+    // Format with spaces
+    let formatted = "";
+    if (type === "amex") {
+      // 4-6-5 format
+      if (value.length > 0) formatted += value.slice(0, 4);
+      if (value.length > 4) formatted += " " + value.slice(4, 10);
+      if (value.length > 10) formatted += " " + value.slice(10);
+    } else {
+      // 4-4-4-4 format
+      for (let i = 0; i < value.length; i += 4) {
+        if (i > 0) formatted += " ";
+        formatted += value.slice(i, i + 4);
+      }
+    }
+
+    setCardDetails({ ...cardDetails, number: formatted });
+    setCardType(type); // Update type state immediately
+  };
+
+  useEffect(() => {
+    const type = detectCardType(cardDetails.number);
+    setCardType(type);
+  }, [cardDetails.number]);
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
@@ -63,14 +150,14 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
   // Apply coupon discount
   let discount = 0;
   let shipping = baseShipping;
-  const appliedCoupon = availableCoupons.find(c => c.code === selectedCoupon || c.code === customCoupon);
+  const appliedCoupon = initialCoupons.find(c => c.code === selectedCoupon || c.code === customCoupon);
   
   if (appliedCoupon) {
-    if (appliedCoupon.type === "percentage") {
-      discount = subtotal * (appliedCoupon.discount / 100);
-    } else if (appliedCoupon.type === "fixed") {
-      discount = appliedCoupon.discount;
-    } else if (appliedCoupon.type === "shipping") {
+    if (appliedCoupon.discount_type === "percentage") {
+      discount = subtotal * (appliedCoupon.discount_value / 100);
+    } else if (appliedCoupon.discount_type === "fixed") {
+      discount = appliedCoupon.discount_value;
+    } else if (appliedCoupon.discount_type === "shipping") {
       shipping = 0;
     }
   }
@@ -78,37 +165,65 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
   const total = subtotal - discount + tax + shipping;
 
   const handlePayment = async () => {
+    setErrors({});
     setIsProcessing(true);
     
-    // Simulate payment processing
+    // Simulate payment processing time
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // Check if card details are filled
-    const isCardFilled = cardDetails.number && cardDetails.expiry && cardDetails.cvc && cardDetails.name;
-    
-    if (isCardFilled) {
-      const result = await createOrder(
-        cartItems,
-        total,
-        discount,
-        { address: "123 Mock St, City, Country" }, // Mock address for simulation
-        paymentMethod
-      );
+    if (paymentMethod === "paypal") {
+      // Positive case flow for PayPal
+      await processOrder();
+      return;
+    }
 
-      if (result.success) {
-        setPaymentResult("success");
-        // Redirect to success page after 2 seconds
-        setTimeout(() => {
-          router.push("/user/orders");
-        }, 2000);
-      } else {
-        console.error("Payment failed:", result.error);
-        setPaymentResult("failed");
-      }
-    } else {
-      setPaymentResult("failed");
+    // Card validation
+    const newErrors: { [key: string]: string } = {};
+    
+    if (!cardType) {
+      newErrors.number = "Invalid card number or unsupported card type (Visa, Mastercard, Amex)";
     }
     
+    if (!validateDate(cardDetails.expiry)) {
+      newErrors.expiry = "Invalid expiry date (MM/YY) or expired";
+    }
+    
+    if (!validateCVV(cardDetails.cvc, cardType)) {
+      newErrors.cvc = "Invalid CVV";
+    }
+    
+    if (!cardDetails.name.trim()) {
+      newErrors.name = "Cardholder name is required";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsProcessing(false);
+      return;
+    }
+
+    await processOrder();
+  };
+
+  const processOrder = async () => {
+    const result = await createOrder(
+      cartItems,
+      total,
+      discount,
+      { address: "123 Mock St, City, Country" }, // Mock address for simulation
+      paymentMethod
+    );
+
+    if (result.success) {
+      setPaymentResult("success");
+      // Redirect to success page after 2 seconds
+      setTimeout(() => {
+        router.push("/user/orders");
+      }, 2000);
+    } else {
+      console.error("Payment failed:", result.error);
+      setPaymentResult("failed");
+    }
     setIsProcessing(false);
   };
 
@@ -187,34 +302,40 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
               {/* Available Coupons */}
               <div className="space-y-2">
                 <Label>Available Coupons</Label>
-                <div className="grid grid-cols-1 gap-2">
-                  {availableCoupons.map((coupon) => (
-                    <label key={coupon.code} className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50">
-                      <input
-                        type="radio"
-                        name="coupon"
-                        value={coupon.code}
-                        checked={selectedCoupon === coupon.code}
-                        onChange={(e) => {
-                          setSelectedCoupon(e.target.value);
-                          setCustomCoupon("");
-                        }}
-                        className="rounded-full"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-sm">{coupon.code}</span>
-                          <span className="text-sm text-green-600 font-medium">
-                            {coupon.type === "percentage" ? `${coupon.discount}% OFF` :
-                             coupon.type === "fixed" ? `RM${coupon.discount} OFF` :
-                             "FREE SHIPPING"}
-                          </span>
+                {initialCoupons.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-2">
+                    {initialCoupons.map((coupon) => (
+                      <label key={coupon.code} className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50">
+                        <input
+                          type="radio"
+                          name="coupon"
+                          value={coupon.code}
+                          checked={selectedCoupon === coupon.code}
+                          onChange={(e) => {
+                            setSelectedCoupon(e.target.value);
+                            setCustomCoupon("");
+                          }}
+                          className="rounded-full"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="font-semibold text-sm">{coupon.code}</span>
+                            <span className="text-sm text-green-600 font-medium">
+                              {coupon.discount_type === "percentage" ? `${coupon.discount_value}% OFF` :
+                               coupon.discount_type === "fixed" ? `RM${coupon.discount_value} OFF` :
+                               "FREE SHIPPING"}
+                            </span>
+                          </div>
+                          {coupon.description && (
+                            <p className="text-xs text-muted-foreground">{coupon.description}</p>
+                          )}
                         </div>
-                        <p className="text-xs text-muted-foreground">{coupon.description}</p>
-                      </div>
-                    </label>
-                  ))}
-                </div>
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No active coupons available at the moment.</p>
+                )}
               </div>
 
               {/* Custom Coupon */}
@@ -230,7 +351,12 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                       setSelectedCoupon("");
                     }}
                   />
-                  <Button variant="outline" size="sm">Apply</Button>
+                  <Button variant="outline" size="sm" onClick={() => {
+                     // Logic to validate custom coupon if needed, currently it just selects it
+                     if(customCoupon) {
+                       // Could trigger a check here if we wanted to validate non-listed coupons
+                     }
+                  }}>Apply</Button>
                 </div>
               </div>
             </CardContent>
@@ -246,7 +372,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer">
+                <label className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : ''}`}>
                   <input
                     type="radio"
                     name="payment"
@@ -257,7 +383,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                   <CreditCard className="w-5 h-5" />
                   <span>Credit/Debit Card</span>
                 </label>
-                <label className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer">
+                <label className={`flex items-center space-x-3 p-3 border rounded-lg cursor-pointer transition-colors ${paymentMethod === 'paypal' ? 'border-blue-500 bg-blue-50' : ''}`}>
                   <input
                     type="radio"
                     name="payment"
@@ -265,22 +391,48 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                     checked={paymentMethod === "paypal"}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   />
-                  <div className="w-5 h-5 bg-blue-600 rounded"></div>
-                  <span>PayPal</span>
+                   {/* Updated PayPal Icon/Logo */}
+                   <img 
+                     src="https://cdn.brandfetch.io/paypal.com" 
+                     alt="PayPal" 
+                     className="h-6 w-auto object-contain"
+                   />
                 </label>
               </div>
 
               {paymentMethod === "card" && (
-                <div className="space-y-4 pt-4 border-t">
+                <div className="space-y-4 pt-4 border-t animate-in fade-in slide-in-from-top-2">
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="cardNumber">Card Number</Label>
-                      <Input 
-                        id="cardNumber" 
-                        placeholder="1234 5678 9012 3456" 
-                        value={cardDetails.number}
-                        onChange={(e) => setCardDetails({...cardDetails, number: e.target.value})}
-                      />
+                      <div className="relative">
+                        <Input 
+                          id="cardNumber" 
+                          placeholder="0000 0000 0000 0000" 
+                          value={cardDetails.number}
+                          onChange={handleCardNumberChange}
+                          inputMode="numeric"
+                          className={errors.number ? "border-red-500" : ""}
+                        />
+                         <div className="absolute right-3 top-2.5 flex gap-1">
+                          {cardType === "visa" && (
+                            <div className="flex items-center justify-center h-5 w-8 bg-white border rounded shadow-sm overflow-hidden">
+                              <img src="https://cdn.brandfetch.io/visa.com" alt="Visa" className="w-full h-full object-contain" />
+                            </div>
+                          )}
+                          {cardType === "mastercard" && (
+                            <div className="flex items-center justify-center h-5 w-8 bg-white border rounded shadow-sm overflow-hidden">
+                              <img src="https://cdn.brandfetch.io/mastercard.com" alt="Mastercard" className="w-full h-full object-contain" />
+                            </div>
+                          )}
+                          {cardType === "amex" && (
+                            <div className="flex items-center justify-center h-5 w-8 bg-white border rounded shadow-sm overflow-hidden">
+                              <img src="https://cdn.brandfetch.io/americanexpress.com" alt="Amex" className="w-full h-full object-contain" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {errors.number && <p className="text-xs text-red-500">{errors.number}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
@@ -289,8 +441,17 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                           id="expiry" 
                           placeholder="MM/YY" 
                           value={cardDetails.expiry}
-                          onChange={(e) => setCardDetails({...cardDetails, expiry: e.target.value})}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/\D/g, '');
+                            if (val.length >= 2) {
+                                val = val.slice(0, 2) + '/' + val.slice(2, 4);
+                            }
+                            setCardDetails({...cardDetails, expiry: val});
+                          }}
+                          maxLength={5}
+                          className={errors.expiry ? "border-red-500" : ""}
                         />
+                         {errors.expiry && <p className="text-xs text-red-500">{errors.expiry}</p>}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="cvv">CVV</Label>
@@ -299,7 +460,10 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                           placeholder="123" 
                           value={cardDetails.cvc}
                           onChange={(e) => setCardDetails({...cardDetails, cvc: e.target.value})}
+                          maxLength={4}
+                          className={errors.cvc ? "border-red-500" : ""}
                         />
+                        {errors.cvc && <p className="text-xs text-red-500">{errors.cvc}</p>}
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -309,7 +473,9 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                         placeholder="John Doe" 
                         value={cardDetails.name}
                         onChange={(e) => setCardDetails({...cardDetails, name: e.target.value})}
+                        className={errors.name ? "border-red-500" : ""}
                       />
+                      {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                     </div>
                   </div>
                 </div>

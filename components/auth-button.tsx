@@ -139,36 +139,42 @@ export function AuthButton() {
             My Orders
           </Link>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
+          <Link href="/user/settings" className="cursor-pointer">
+            <Settings className="w-4 h-4 mr-2" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
         {userRole === "admin" && (
           <>
-            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
+            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
               <Link href="/admin" className="cursor-pointer">
                 <LayoutDashboard className="w-4 h-4 mr-2" />
                 Admin Dashboard
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
+            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
               <Link href="/admin/products" className="cursor-pointer">
                 <Shirt className="w-4 h-4 mr-2" />
                 Products
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '300ms', animationFillMode: 'backwards' }}>
+            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '350ms', animationFillMode: 'backwards' }}>
               <Link href="/admin/orders" className="cursor-pointer">
                 <FileText className="w-4 h-4 mr-2" />
                 Orders
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '350ms', animationFillMode: 'backwards' }}>
+            <DropdownMenuItem asChild className="animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: '400ms', animationFillMode: 'backwards' }}>
               <Link href="/admin/settings" className="cursor-pointer">
                 <Settings className="w-4 h-4 mr-2" />
-                Settings
+                Admin Settings
               </Link>
             </DropdownMenuItem>
           </>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: userRole === "admin" ? '400ms' : '200ms', animationFillMode: 'backwards' }}>
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600 animate-in fade-in slide-in-from-top-1 duration-300" style={{ animationDelay: userRole === "admin" ? '450ms' : '250ms', animationFillMode: 'backwards' }}>
           <LogOut className="w-4 h-4 mr-2" />
           Logout
         </DropdownMenuItem>

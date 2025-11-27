@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="container max-w-4xl py-10">
+    <div className="container w-full py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
         <p className="text-muted-foreground">

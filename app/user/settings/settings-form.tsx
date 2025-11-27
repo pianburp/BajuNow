@@ -51,7 +51,7 @@ export function SettingsForm({ initialData }: SettingsFormProps) {
   }
 
   return (
-    <form action={handleSubmit} className="space-y-6 max-w-2xl">
+    <form action={handleSubmit} className="space-y-6 w-full">
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <Input 

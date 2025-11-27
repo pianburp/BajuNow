@@ -58,11 +58,11 @@ export default async function SettingsPage() {
                 <Input id="tax-rate" type="number" step="0.01" defaultValue="10.00" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="shipping-fee">Shipping Fee ($)</Label>
+                <Label htmlFor="shipping-fee">Shipping Fee (RM)</Label>
                 <Input id="shipping-fee" type="number" step="0.01" defaultValue="5.99" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="free-shipping">Free Shipping Threshold ($)</Label>
+                <Label htmlFor="free-shipping">Free Shipping Threshold (RM)</Label>
                 <Input id="free-shipping" type="number" step="0.01" defaultValue="100.00" />
               </div>
               <Button>Save Changes</Button>
