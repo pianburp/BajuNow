@@ -14,14 +14,14 @@ import {
 import { Menu, LogOut, ShoppingCart, Package, LayoutDashboard, Shirt, Settings, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 export function AuthButton() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string>("user");
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const getUser = async () => {

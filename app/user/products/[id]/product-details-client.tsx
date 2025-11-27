@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +43,7 @@ export default function ProductDetailsClient({ product, variants, images }: Prod
   const [isAdding, setIsAdding] = useState(false);
   const [mainImage, setMainImage] = useState(images.find(img => img.is_primary)?.storage_path || images[0]?.storage_path);
 
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { toast } = useToast();
 
   // Get unique colors and sizes

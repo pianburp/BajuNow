@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Upload, Save, X, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 const COLORS = [
@@ -24,7 +24,7 @@ const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
 export default function AddProductPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   
