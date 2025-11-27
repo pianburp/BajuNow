@@ -52,7 +52,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
   const availableCoupons = [
     { code: "SAVE10", discount: 10, type: "percentage", description: "10% off your order" },
     { code: "NEWUSER", discount: 15, type: "percentage", description: "15% off for new customers" },
-    { code: "SAVE5", discount: 5, type: "fixed", description: "$5 off your order" },
+    { code: "SAVE5", discount: 5, type: "fixed", description: "RM5 off your order" },
     { code: "FREESHIP", discount: 9.99, type: "shipping", description: "Free shipping" }
   ];
 
@@ -126,7 +126,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                 Your order has been confirmed. You will be redirected to your orders page.
               </p>
               <p className="text-sm text-muted-foreground">
-                Order Total: ${total.toFixed(2)}
+                Order Total: RM{total.toFixed(2)}
               </p>
             </div>
           </>
@@ -206,7 +206,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                           <span className="font-semibold text-sm">{coupon.code}</span>
                           <span className="text-sm text-green-600 font-medium">
                             {coupon.type === "percentage" ? `${coupon.discount}% OFF` :
-                             coupon.type === "fixed" ? `$${coupon.discount} OFF` :
+                             coupon.type === "fixed" ? `RM${coupon.discount} OFF` :
                              "FREE SHIPPING"}
                           </span>
                         </div>
@@ -351,7 +351,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                         {item.size} • {item.color} • Qty: {item.quantity}
                       </p>
                     </div>
-                    <p className="font-semibold text-sm">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold text-sm">RM{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 ))}
               </div>
@@ -360,26 +360,26 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
               <div className="space-y-2 pt-4 border-t">
                 <div className="flex justify-between text-sm">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>RM{subtotal.toFixed(2)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600">
                     <span>Discount ({appliedCoupon?.code})</span>
-                    <span>-${discount.toFixed(2)}</span>
+                    <span>-RM{discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm">
                   <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>RM{tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? 'Free' : `RM${shipping.toFixed(2)}`}</span>
                 </div>
                 <hr />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>RM{total.toFixed(2)}</span>
                 </div>
               </div>
 
@@ -399,7 +399,7 @@ export default function PaymentClient({ cartItems, userEmail }: PaymentClientPro
                   ) : (
                     <>
                       <Shield className="w-4 h-4 mr-2" />
-                      Pay ${total.toFixed(2)}
+                      Pay RM{total.toFixed(2)}
                     </>
                   )}
                 </Button>

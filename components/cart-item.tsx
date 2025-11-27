@@ -54,7 +54,7 @@ export function CartItemComponent({ item, onQuantityChange, onRemove }: CartItem
         <p className="text-sm text-muted-foreground">
           Size: {item.size} • Color: {item.color}
         </p>
-        <p className="font-bold text-lg">${item.price.toFixed(2)}</p>
+        <p className="font-bold text-lg">RM{item.price.toFixed(2)}</p>
       </div>
       
       <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export function CartItemComponent({ item, onQuantityChange, onRemove }: CartItem
       </div>
       
       <div className="text-right">
-        <p className="font-semibold">${(item.price * quantity).toFixed(2)}</p>
+        <p className="font-semibold">RM{(item.price * quantity).toFixed(2)}</p>
         <Button 
           variant="ghost" 
           size="sm" 

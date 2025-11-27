@@ -118,24 +118,24 @@ export function ProductFilters({ categories }: ProductFiltersProps) {
           <Label className="text-xs text-muted-foreground">Price Range</Label>
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">RM</span>
               <Input 
                 placeholder="Min" 
                 type="number" 
                 min="0"
-                className="pl-6" 
+                className="pl-10" 
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
               />
             </div>
             <span className="text-muted-foreground">-</span>
             <div className="relative flex-1">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">RM</span>
               <Input 
                 placeholder="Max" 
                 type="number" 
                 min="0"
-                className="pl-6" 
+                className="pl-10" 
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
               />

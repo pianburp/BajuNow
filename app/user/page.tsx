@@ -81,7 +81,7 @@ export default async function UserDashboard(props: {
               Premium Shirts for Every Occasion
             </h1>
             <p className="text-lg text-gray-200">
-              Welcome back. Discover our latest arrivals and timeless classics designed for comfort and style.
+              Welcome back, {profile?.full_name}. Discover our latest arrivals and timeless classics designed for comfort and style.
             </p>
             <Button size="lg" variant="secondary" asChild className="font-semibold">
               <Link href="#products">Shop Now</Link>
@@ -165,7 +165,7 @@ function ProductCard({ product, supabase, featured = false }: { product: any, su
       </CardHeader>
       
       <CardContent className="p-4 pt-0 flex-grow">
-        <p className="font-bold text-xl text-primary mt-2">${product.base_price}</p>
+        <p className="font-bold text-xl text-primary mt-2">RM{product.base_price}</p>
       </CardContent>
       
       <CardFooter className="p-4 pt-0">

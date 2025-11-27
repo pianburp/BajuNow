@@ -55,7 +55,28 @@ export async function createOrder(
     return { success: false, error: itemsError.message };
   }
 
-  // 3. Clear Cart
+  // 3. Update Stock
+  await Promise.all(items.map(async (item: any) => {
+    const { data: variant } = await supabase
+      .from('product_variants')
+      .select('stock_quantity')
+      .eq('id', item.variantId)
+      .single();
+
+    if (variant) {
+      const newStock = Math.max(0, variant.stock_quantity - item.quantity);
+      const { error: updateStockError } = await supabase
+        .from('product_variants')
+        .update({ stock_quantity: newStock })
+        .eq('id', item.variantId);
+
+      if (updateStockError) {
+        console.error(`Error updating stock for variant ${item.variantId}:`, updateStockError);
+      }
+    }
+  }));
+
+  // 4. Clear Cart
   const { error: clearCartError } = await supabase
     .from('cart_items')
     .delete()

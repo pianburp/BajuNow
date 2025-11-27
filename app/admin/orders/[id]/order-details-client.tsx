@@ -101,14 +101,14 @@ export default function OrderDetailsClient({ order }: { order: Order }) {
                       <p className="text-sm text-muted-foreground">{item.variant_info}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">${item.unit_price.toFixed(2)} x {item.quantity}</p>
-                      <p className="font-bold">${(item.unit_price * item.quantity).toFixed(2)}</p>
+                      <p className="font-medium">RM{item.unit_price.toFixed(2)} x {item.quantity}</p>
+                      <p className="font-bold">RM{(item.unit_price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
                 <div className="flex justify-between pt-4 border-t font-bold text-lg">
                   <span>Total</span>
-                  <span>${order.total_amount.toFixed(2)}</span>
+                  <span>RM{order.total_amount.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>

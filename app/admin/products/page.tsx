@@ -2,7 +2,7 @@ import { requireAdmin } from "@/lib/rbac";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShirtIcon, PlusIcon, Pencil, Trash2, Package } from "lucide-react";
+import { ShirtIcon, PlusIcon, Pencil, Trash2, Package, TicketPercent } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -48,6 +48,16 @@ export default async function ProductsPage() {
     console.error("Error fetching images:", JSON.stringify(imagesError, null, 2));
   }
 
+  // Fetch coupons
+  const { data: coupons, error: couponsError } = await supabase
+    .from('coupons')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (couponsError) {
+    console.error("Error fetching coupons:", JSON.stringify(couponsError, null, 2));
+  }
+
   // Merge data
   const products = productsData.map(product => {
     const variants = variantsData?.filter(v => v.product_id === product.id) || [];
@@ -66,6 +76,16 @@ export default async function ProductsPage() {
     
     const supabase = await createClient();
     await supabase.from('products').delete().eq('id', id);
+    revalidatePath('/admin/products');
+  }
+
+  async function deleteCoupon(formData: FormData) {
+    'use server'
+    const id = formData.get('id') as string;
+    if (!id) return;
+    
+    const supabase = await createClient();
+    await supabase.from('coupons').delete().eq('id', id);
     revalidatePath('/admin/products');
   }
 
@@ -138,7 +158,7 @@ export default async function ProductsPage() {
                       <p className="text-sm text-muted-foreground mb-2">SKU: {product.sku}</p>
                       
                       <div className="flex justify-between items-center mb-4">
-                        <p className="font-bold text-lg">${product.base_price}</p>
+                        <p className="font-bold text-lg">RM{product.base_price}</p>
                         <div className={`text-sm ${totalStock === 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
                           {totalStock} in stock
                         </div>
@@ -163,6 +183,78 @@ export default async function ProductsPage() {
                   </div>
                 );
               })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Coupons</CardTitle>
+            <CardDescription>Manage discount codes ({coupons?.length || 0})</CardDescription>
+          </div>
+          <Link href="/admin/coupons/add">
+            <Button variant="outline" size="sm">
+              <PlusIcon className="w-4 h-4 mr-2" />
+              Add Coupon
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {!coupons || coupons.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <TicketPercent className="w-12 h-12 mx-auto mb-4 opacity-50" />
+              <p>No coupons found.</p>
+            </div>
+          ) : (
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-muted text-muted-foreground font-medium">
+                  <tr>
+                    <th className="p-4">Code</th>
+                    <th className="p-4">Type</th>
+                    <th className="p-4">Value</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Expires</th>
+                    <th className="p-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {coupons.map((coupon) => (
+                    <tr key={coupon.id} className="border-t">
+                      <td className="p-4 font-medium">{coupon.code}</td>
+                      <td className="p-4 capitalize">{coupon.discount_type}</td>
+                      <td className="p-4">
+                        {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `RM${coupon.discount_value}`}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-1 rounded text-xs ${coupon.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                          {coupon.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link href={`/admin/coupons/${coupon.id}/edit`}>
+                            <Button variant="ghost" size="icon">
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          </Link>
+                          <form action={deleteCoupon}>
+                            <input type="hidden" name="id" value={coupon.id} />
+                            <Button variant="ghost" size="icon" type="submit" className="text-destructive hover:text-destructive/90">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </CardContent>

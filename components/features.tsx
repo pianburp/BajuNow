@@ -15,7 +15,7 @@ const FEATURES = [
   },
   {
     title: "Free Shipping",
-    description: "Enjoy free shipping on orders over $50 within the country. Track your package every step of the way.",
+    description: "Enjoy free shipping on orders over RM50 within the country. Track your package every step of the way.",
     icon: Truck,
     mediaType: "image",
     src: "/images/delivery.jpg",

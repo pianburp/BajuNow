@@ -133,7 +133,7 @@ export default function ProductDetailsClient({ product, variants, images }: Prod
       <div className="flex flex-col gap-6">
         <div>
           <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-2xl font-bold text-primary mt-2">${currentPrice}</p>
+          <p className="text-2xl font-bold text-primary mt-2">RM{currentPrice}</p>
         </div>
 
         <div className="prose max-w-none text-muted-foreground">

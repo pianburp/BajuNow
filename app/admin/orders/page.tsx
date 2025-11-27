@@ -74,7 +74,7 @@ export default async function AdminOrdersPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="font-bold">${order.total_amount.toFixed(2)}</p>
+                      <p className="font-bold">RM{order.total_amount.toFixed(2)}</p>
                       <Badge variant={getStatusVariant(order.status) as "default" | "secondary" | "destructive" | "outline"}>
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </Badge>

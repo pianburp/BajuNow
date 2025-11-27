@@ -45,8 +45,8 @@ export function ContactUs() {
                 <p className="text-muted-foreground mb-2">
                   Mon-Fri from 8am to 5pm.
                 </p>
-                <a href="tel:+123456789" className="text-lg font-medium hover:underline">
-                  +1 (234) 567-89
+                <a href="tel:+6023456789" className="text-lg font-medium hover:underline">
+                  +60 (234) 567-89
                 </a>
               </div>
             </div>
@@ -61,8 +61,8 @@ export function ContactUs() {
                   Come say hello at our office.
                 </p>
                 <address className="text-lg font-medium not-italic">
-                  123 Fashion Street<br />
-                  New York, NY 10001
+                  123 Jalan Bukit Bintang<br />
+                  Kuala Lumpur, Malaysia
                 </address>
               </div>
             </div>

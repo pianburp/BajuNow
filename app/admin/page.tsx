@@ -1,16 +1,65 @@
 import { getUserProfile } from "@/lib/rbac";
+import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShirtIcon, PackageIcon, DollarSignIcon, UsersIcon } from "lucide-react";
 
 export default async function AdminDashboard() {
   const profile = await getUserProfile();
+  const supabase = await createClient();
+
+  // Fetch dashboard data in parallel
+  const [
+    { count: productsCount },
+    { count: ordersCount },
+    { count: usersCount },
+    { data: revenueData },
+    { data: recentOrders },
+    { data: allOrderItems }
+  ] = await Promise.all([
+    supabase.from("products").select("*", { count: "exact", head: true }),
+    supabase.from("orders").select("*", { count: "exact", head: true }),
+    supabase.from("profiles").select("*", { count: "exact", head: true }),
+    supabase.from("orders").select("total_amount"),
+    supabase.from("orders")
+      .select(`
+        id,
+        total_amount,
+        status,
+        created_at,
+        order_items (
+          product_name,
+          quantity
+        )
+      `)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase.from("order_items").select("product_name, quantity, unit_price")
+  ]);
+
+  const totalRevenue = revenueData?.reduce((acc, order) => acc + (Number(order.total_amount) || 0), 0) || 0;
+
+  // Calculate top products
+  const productStats: Record<string, { sold: number; revenue: number }> = {};
+  
+  allOrderItems?.forEach((item) => {
+    if (!productStats[item.product_name]) {
+      productStats[item.product_name] = { sold: 0, revenue: 0 };
+    }
+    productStats[item.product_name].sold += item.quantity;
+    productStats[item.product_name].revenue += item.quantity * Number(item.unit_price);
+  });
+
+  const topProducts = Object.entries(productStats)
+    .map(([name, stats]) => ({ name, ...stats }))
+    .sort((a, b) => b.sold - a.sold)
+    .slice(0, 5);
 
   return (
     <div className="flex flex-col gap-8">
       <div>
         <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {profile?.email} - Manage your BajuNow store
+          Welcome back, {profile?.full_name} - Manage your BajuNow store
         </p>
       </div>
 
@@ -23,9 +72,9 @@ export default async function AdminDashboard() {
             <ShirtIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{productsCount || 0}</div>
             <p className="text-xs text-muted-foreground">
-              +2 from last month
+              Active products
             </p>
           </CardContent>
         </Card>
@@ -38,9 +87,9 @@ export default async function AdminDashboard() {
             <PackageIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">142</div>
+            <div className="text-2xl font-bold">{ordersCount || 0}</div>
             <p className="text-xs text-muted-foreground">
-              +18 from last month
+              Lifetime orders
             </p>
           </CardContent>
         </Card>
@@ -53,9 +102,9 @@ export default async function AdminDashboard() {
             <DollarSignIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$4,231</div>
+            <div className="text-2xl font-bold">RM{totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
             <p className="text-xs text-muted-foreground">
-              +12% from last month
+              Lifetime revenue
             </p>
           </CardContent>
         </Card>
@@ -68,9 +117,9 @@ export default async function AdminDashboard() {
             <UsersIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
+            <div className="text-2xl font-bold">{usersCount || 0}</div>
             <p className="text-xs text-muted-foreground">
-              +7 from last month
+              Registered users
             </p>
           </CardContent>
         </Card>
@@ -84,18 +133,25 @@ export default async function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center justify-between border-b pb-2">
+              {recentOrders?.map((order) => (
+                <div key={order.id} className="flex items-center justify-between border-b pb-2 last:border-0">
                   <div>
-                    <p className="font-medium">Order #{1000 + i}</p>
-                    <p className="text-sm text-muted-foreground">Premium Shirt x{i}</p>
+                    <p className="font-medium">Order #{order.id.slice(0, 8)}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {order.order_items && order.order_items.length > 0 
+                        ? `${order.order_items[0].product_name}${order.order_items.length > 1 ? ` +${order.order_items.length - 1} more` : ''}`
+                        : 'No items'}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">${(39.99 * i).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">Pending</p>
+                    <p className="font-bold">RM{Number(order.total_amount).toFixed(2)}</p>
+                    <p className="text-sm text-muted-foreground capitalize">{order.status}</p>
                   </div>
                 </div>
               ))}
+              {(!recentOrders || recentOrders.length === 0) && (
+                <p className="text-sm text-muted-foreground text-center py-4">No orders found</p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -103,22 +159,25 @@ export default async function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Top Products</CardTitle>
-            <CardDescription>Best selling items this month</CardDescription>
+            <CardDescription>Best selling items</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {["Classic White Shirt", "Navy Blue Formal", "Black Casual"].map((name, i) => (
-                <div key={i} className="flex items-center justify-between border-b pb-2">
+              {topProducts.map((product, i) => (
+                <div key={i} className="flex items-center justify-between border-b pb-2 last:border-0">
                   <div className="flex items-center gap-3">
                     <ShirtIcon className="w-8 h-8 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">{name}</p>
-                      <p className="text-sm text-muted-foreground">{15 - i * 2} sold</p>
+                      <p className="font-medium">{product.name}</p>
+                      <p className="text-sm text-muted-foreground">{product.sold} sold</p>
                     </div>
                   </div>
-                  <p className="font-bold">${(49.99 - i * 5).toFixed(2)}</p>
+                  <p className="font-bold">RM{product.revenue.toFixed(2)}</p>
                 </div>
               ))}
+              {topProducts.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">No sales data yet</p>
+              )}
             </div>
           </CardContent>
         </Card>

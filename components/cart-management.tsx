@@ -45,7 +45,7 @@ export function CartManagement({ initialItems }: CartManagementProps) {
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08; // 8% tax
-  const shipping = subtotal > 50 ? 0 : 9.99; // Free shipping over $50
+  const shipping = subtotal > 50 ? 0 : 9.99; // Free shipping over RM50
   const total = subtotal + tax + shipping;
 
   if (cartItems.length === 0) {
@@ -98,20 +98,20 @@ export function CartManagement({ initialItems }: CartManagementProps) {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>RM{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>RM{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+                <span>{shipping === 0 ? 'Free' : `RM${shipping.toFixed(2)}`}</span>
               </div>
               <hr />
               <div className="flex justify-between text-lg font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>RM{total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -125,7 +125,7 @@ export function CartManagement({ initialItems }: CartManagementProps) {
 
             <div className="text-xs text-muted-foreground text-center">
               {shipping > 0 && (
-                <p>Add ${(50 - subtotal).toFixed(2)} more for free shipping!</p>
+                <p>Add RM{(50 - subtotal).toFixed(2)} more for free shipping!</p>
               )}
             </div>
           </CardContent>

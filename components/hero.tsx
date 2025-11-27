@@ -57,7 +57,7 @@ export function Hero() {
               <CardContent className="p-6 text-white relative z-10">
                 <CardTitle className="text-xl">Summer Linen Shirt</CardTitle>
                 <p className="text-sm mt-1">Lightweight. Breathable. Timeless.</p>
-                <div className="mt-4 text-sm font-semibold">$49.00</div>
+                <div className="mt-4 text-sm font-semibold">RM49.00</div>
               </CardContent>
             </div>
           </Card>

@@ -88,13 +88,13 @@ export default async function OrdersPage() {
                           <p className="font-medium">{item.product_name}</p>
                           <p className="text-sm text-muted-foreground">{item.variant_info} x {item.quantity}</p>
                         </div>
-                        <p className="font-medium">${item.unit_price.toFixed(2)}</p>
+                        <p className="font-medium">RM{item.unit_price.toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
                   <div className="border-t pt-4 flex justify-between font-bold">
                     <span>Total</span>
-                    <span>${order.total_amount.toFixed(2)}</span>
+                    <span>RM{order.total_amount.toFixed(2)}</span>
                   </div>
                 </div>
               </CardContent>
