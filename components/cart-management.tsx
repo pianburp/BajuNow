@@ -120,14 +120,14 @@ export function CartManagement({ initialItems, userId }: CartManagementProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
       {/* Cart Items */}
       <div className="lg:col-span-2 space-y-4">
         <Card>
           <CardHeader>
-            <CardTitle>Cart Items ({cartItems.length})</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Cart Items ({cartItems.length})</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-3 sm:px-6">
             {cartItems.map((item) => (
               <CartItemComponent
                 key={item.id}

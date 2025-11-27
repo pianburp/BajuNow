@@ -60,7 +60,7 @@ export default async function UserDashboard(props: {
   return (
     <div className="flex flex-col gap-10 pb-10">
       {/* Hero Section */}
-      <div className="relative rounded-xl overflow-hidden min-h-[400px] flex items-center">
+      <div className="relative rounded-xl overflow-hidden min-h-[300px] sm:min-h-[400px] flex items-center">
         {/* Background Video */}
         <video
           autoPlay
@@ -76,16 +76,16 @@ export default async function UserDashboard(props: {
         <div className="absolute inset-0 bg-black/60" />
 
         {/* Content */}
-        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 w-full">
-          <div className="space-y-4 max-w-xl">
-            <Badge className="mb-2 bg-white/20 text-white hover:bg-white/30 border-none">New Collection</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+        <div className="relative z-10 p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 w-full">
+          <div className="space-y-3 sm:space-y-4 max-w-xl">
+            <Badge className="mb-2 bg-white/20 text-white hover:bg-white/30 border-none text-xs sm:text-sm">New Collection</Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white">
               Premium Shirts for Every Occasion
             </h1>
-            <p className="text-lg text-gray-200">
+            <p className="text-sm sm:text-lg text-gray-200">
               Welcome back, {profile?.full_name}. Discover our latest arrivals and timeless classics designed for comfort and style.
             </p>
-            <Button size="lg" variant="secondary" asChild className="font-semibold">
+            <Button size="lg" variant="secondary" asChild className="font-semibold w-full sm:w-auto">
               <Link href="#products">Shop Now</Link>
             </Button>
           </div>
@@ -94,14 +94,14 @@ export default async function UserDashboard(props: {
 
       {/* Featured Section */}
       {featuredProducts && featuredProducts.length > 0 && (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+            <h2 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500 fill-yellow-500" />
               Featured Products
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {featuredProducts.map(product => (
               <ProductCard key={product.id} product={product} supabase={supabase} featured />
             ))}
@@ -110,12 +110,12 @@ export default async function UserDashboard(props: {
       )}
 
       {/* All Products Section */}
-      <div id="products" className="space-y-6">
-        <div className="flex flex-col gap-4">
-          <h2 className="text-2xl font-bold">All Products</h2>
+      <div id="products" className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          <h2 className="text-xl sm:text-2xl font-bold">All Products</h2>
           <ProductFilters categories={categories || []} />
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {allProducts?.map((product) => (
             <ProductCard key={product.id} product={product} supabase={supabase} />
           ))}

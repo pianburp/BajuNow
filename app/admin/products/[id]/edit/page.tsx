@@ -35,26 +35,26 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   };
 
   return (
-    <div className="flex flex-col gap-8 max-w-4xl">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-6 sm:gap-8 max-w-4xl">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <Link href="/admin/products">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="w-8 h-8 sm:w-10 sm:h-10">
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div className="flex-1">
-          <h1 className="text-3xl font-bold mb-2">Edit Product</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Edit Product</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Update product information for {product.name}
           </p>
         </div>
-        <Button variant="destructive" size="sm">
+        <Button variant="destructive" size="sm" className="w-full sm:w-auto mt-2 sm:mt-0">
           <Trash2 className="w-4 h-4 mr-2" />
           Delete Product
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Product Information */}
         <Card>
           <CardHeader>
@@ -80,7 +80,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="price">Price ($)</Label>
                 <Input 
@@ -111,7 +111,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <select 
@@ -223,11 +223,11 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
-            <Link href="/admin/products" className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Link href="/admin/products" className="w-full sm:flex-1 order-2 sm:order-1">
               <Button variant="outline" className="w-full">Cancel</Button>
             </Link>
-            <Button className="flex-1">
+            <Button className="w-full sm:flex-1 order-1 sm:order-2">
               <Save className="w-4 h-4 mr-2" />
               Update Product
             </Button>

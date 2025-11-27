@@ -130,13 +130,13 @@ export default function ProductDetailsClient({ product, variants, images }: Prod
       </div>
 
       {/* Product Info */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <div>
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <p className="text-2xl font-bold text-primary mt-2">RM{currentPrice}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold">{product.name}</h1>
+          <p className="text-xl sm:text-2xl font-bold text-primary mt-2">RM{currentPrice}</p>
         </div>
 
-        <div className="prose max-w-none text-muted-foreground">
+        <div className="prose max-w-none text-sm sm:text-base text-muted-foreground">
           <p>{product.description}</p>
         </div>
 

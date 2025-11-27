@@ -44,10 +44,10 @@ export default async function AdminOrdersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 sm:gap-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Order Management</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Order Management</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           View and manage customer orders
         </p>
       </div>
@@ -63,26 +63,26 @@ export default async function AdminOrdersPage() {
               <p className="text-center text-muted-foreground py-8">No orders found.</p>
             ) : (
               orders.map((order) => (
-                <div key={order.id} className="flex items-center justify-between border p-4 rounded-lg">
+                <div key={order.id} className="flex flex-col sm:flex-row sm:items-center justify-between border p-3 sm:p-4 rounded-lg gap-3 sm:gap-4">
                   <div className="flex-1">
-                    <p className="font-semibold">Order #{order.id.slice(0, 8)}</p>
-                    <p className="text-sm text-muted-foreground">User: {order.user_id.slice(0, 8)}...</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="font-semibold text-sm sm:text-base">Order #{order.id.slice(0, 8)}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">User: {order.user_id.slice(0, 8)}...</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       {order.order_items?.length || 0} item(s)
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="font-bold">RM{order.total_amount.toFixed(2)}</p>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                    <div className="text-left sm:text-right">
+                      <p className="font-bold text-sm sm:text-base">RM{order.total_amount.toFixed(2)}</p>
                       <Badge variant={getStatusVariant(order.status) as "default" | "secondary" | "destructive" | "outline"}>
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                       </Badge>
                     </div>
                     <Link href={`/admin/orders/${order.id}`}>
-                      <Button variant="outline" size="sm">View Details</Button>
+                      <Button variant="outline" size="sm" className="text-xs sm:text-sm">View Details</Button>
                     </Link>
                   </div>
                 </div>

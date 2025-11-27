@@ -219,22 +219,22 @@ export default function AddProductClient() {
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-6 sm:gap-8 w-full">
+      <div className="flex items-start sm:items-center gap-4">
         <Link href="/admin/products">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="flex-shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold mb-2">Add New Product</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Add New Product</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Create a new shirt product for your store
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Product Information */}
         <Card>
           <CardHeader>
@@ -264,7 +264,7 @@ export default function AddProductClient() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="price">Price (RM)</Label>
                 <Input 
@@ -301,7 +301,7 @@ export default function AddProductClient() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="categoryId">Category</Label>
                 <select 
@@ -331,7 +331,7 @@ export default function AddProductClient() {
         </Card>
 
         {/* Product Variants & Images */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Product Images */}
           <Card>
             <CardHeader>
@@ -340,7 +340,7 @@ export default function AddProductClient() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div 
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                className={`border-2 border-dashed rounded-lg p-4 sm:p-8 text-center transition-colors ${
                   dragActive ? "border-primary bg-primary/5" : "border-muted-foreground/25"
                 }`}
                 onDragEnter={handleDrag}
@@ -374,7 +374,7 @@ export default function AddProductClient() {
 
               {/* Image Previews */}
               {previewUrls.length > 0 && (
-                <div className="grid grid-cols-3 gap-4 mt-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-4">
                   {previewUrls.map((url, index) => (
                     <div key={url} className="relative aspect-square rounded-md overflow-hidden border">
                       <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
@@ -439,11 +439,11 @@ export default function AddProductClient() {
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
-            <Link href="/admin/products" className="flex-1">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Link href="/admin/products" className="flex-1 order-2 sm:order-1">
               <Button variant="outline" className="w-full">Cancel</Button>
             </Link>
-            <Button className="flex-1" onClick={handleSave} disabled={loading}>
+            <Button className="flex-1 order-1 sm:order-2" onClick={handleSave} disabled={loading}>
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
               Save Product
             </Button>

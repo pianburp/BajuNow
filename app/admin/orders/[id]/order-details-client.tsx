@@ -70,22 +70,22 @@ export default function OrderDetailsClient({ order }: { order: Order }) {
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <Link href="/admin/orders">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="w-8 h-8 sm:w-10 sm:h-10">
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold mb-2">Order Details</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Order Details</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Manage order #{order.id.slice(0, 8)}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <div className="lg:col-span-2 space-y-6">
           {/* Order Items */}
           <Card>
@@ -95,18 +95,18 @@ export default function OrderDetailsClient({ order }: { order: Order }) {
             <CardContent>
               <div className="space-y-4">
                 {order.order_items.map((item) => (
-                  <div key={item.id} className="flex justify-between items-center border-b pb-4 last:border-0 last:pb-0">
+                  <div key={item.id} className="flex flex-col sm:flex-row justify-between sm:items-center border-b pb-4 last:border-0 last:pb-0 gap-1 sm:gap-4">
                     <div>
-                      <p className="font-medium">{item.product_name}</p>
-                      <p className="text-sm text-muted-foreground">{item.variant_info}</p>
+                      <p className="font-medium text-sm sm:text-base">{item.product_name}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{item.variant_info}</p>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium">RM{item.unit_price.toFixed(2)} x {item.quantity}</p>
-                      <p className="font-bold">RM{(item.unit_price * item.quantity).toFixed(2)}</p>
+                    <div className="text-left sm:text-right">
+                      <p className="font-medium text-xs sm:text-sm">RM{item.unit_price.toFixed(2)} x {item.quantity}</p>
+                      <p className="font-bold text-sm sm:text-base">RM{(item.unit_price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
-                <div className="flex justify-between pt-4 border-t font-bold text-lg">
+                <div className="flex justify-between pt-4 border-t font-bold text-base sm:text-lg">
                   <span>Total</span>
                   <span>RM{order.total_amount.toFixed(2)}</span>
                 </div>

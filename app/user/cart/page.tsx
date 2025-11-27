@@ -64,10 +64,10 @@ export default async function CartPage() {
   }) || [];
 
   return (
-    <div className="flex flex-col gap-8 max-w-6xl mx-auto">
+    <div className="flex flex-col gap-6 sm:gap-8 max-w-6xl mx-auto">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Shopping Cart</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">Shopping Cart</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Review your selected items and proceed to checkout
         </p>
       </div>

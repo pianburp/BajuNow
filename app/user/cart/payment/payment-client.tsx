@@ -229,15 +229,15 @@ export default function PaymentClient({ cartItems, userEmail, initialCoupons }: 
 
   if (paymentResult) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 px-4">
         {paymentResult === "success" ? (
           <>
             <div className="text-green-600">
-              <CheckCircle className="w-16 h-16 mx-auto mb-4" />
+              <CheckCircle className="w-12 sm:w-16 h-12 sm:h-16 mx-auto mb-4" />
             </div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold mb-2 text-green-600">Payment Successful!</h1>
-              <p className="text-muted-foreground mb-4">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-green-600">Payment Successful!</h1>
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
                 Your order has been confirmed. You will be redirected to your orders page.
               </p>
               <p className="text-sm text-muted-foreground">
@@ -248,19 +248,19 @@ export default function PaymentClient({ cartItems, userEmail, initialCoupons }: 
         ) : (
           <>
             <div className="text-red-600">
-              <XCircle className="w-16 h-16 mx-auto mb-4" />
+              <XCircle className="w-12 sm:w-16 h-12 sm:h-16 mx-auto mb-4" />
             </div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold mb-2 text-red-600">Payment Failed</h1>
-              <p className="text-muted-foreground mb-6">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-red-600">Payment Failed</h1>
+              <p className="text-muted-foreground mb-6 text-sm sm:text-base">
                 There was an issue processing your payment. Please try again.
               </p>
-              <div className="flex gap-4">
-                <Button onClick={() => setPaymentResult(null)}>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                <Button onClick={() => setPaymentResult(null)} className="w-full sm:w-auto">
                   Try Again
                 </Button>
                 <Link href="/user/cart">
-                  <Button variant="outline">Back to Cart</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">Back to Cart</Button>
                 </Link>
               </div>
             </div>
@@ -271,22 +271,22 @@ export default function PaymentClient({ cartItems, userEmail, initialCoupons }: 
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-6xl mx-auto">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col gap-6 sm:gap-8 max-w-6xl mx-auto">
+      <div className="flex items-start sm:items-center gap-4">
         <Link href="/user/cart">
-          <Button variant="outline" size="icon">
+          <Button variant="outline" size="icon" className="flex-shrink-0">
             <ArrowLeft className="w-4 h-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold mb-2">Checkout</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Checkout</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Complete your purchase securely
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
         {/* Payment Form */}
         <div className="space-y-6">
           {/* Coupon Selection */}

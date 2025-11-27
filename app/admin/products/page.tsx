@@ -92,16 +92,16 @@ export default async function ProductsPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col gap-6 sm:gap-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Product Management</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Product Management</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
             Manage your shirt inventory and pricing
           </p>
         </div>
         <Link href="/admin/products/add">
-          <Button>
+          <Button className="w-full sm:w-auto">
             <PlusIcon className="w-4 h-4 mr-2" />
             Add Product
           </Button>
@@ -197,13 +197,13 @@ export default async function ProductsPage() {
       </Card>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <CardTitle>Coupons</CardTitle>
             <CardDescription>Manage discount codes ({coupons?.length || 0})</CardDescription>
           </div>
           <Link href="/admin/coupons/add">
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <PlusIcon className="w-4 h-4 mr-2" />
               Add Coupon
             </Button>
@@ -216,35 +216,35 @@ export default async function ProductsPage() {
               <p>No coupons found.</p>
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden">
-              <table className="w-full text-sm text-left">
+            <div className="border rounded-lg overflow-x-auto">
+              <table className="w-full text-sm text-left min-w-[600px]">
                 <thead className="bg-muted text-muted-foreground font-medium">
                   <tr>
-                    <th className="p-4">Code</th>
-                    <th className="p-4">Type</th>
-                    <th className="p-4">Value</th>
-                    <th className="p-4">Status</th>
-                    <th className="p-4">Expires</th>
-                    <th className="p-4 text-right">Actions</th>
+                    <th className="p-3 sm:p-4">Code</th>
+                    <th className="p-3 sm:p-4">Type</th>
+                    <th className="p-3 sm:p-4">Value</th>
+                    <th className="p-3 sm:p-4">Status</th>
+                    <th className="p-3 sm:p-4">Expires</th>
+                    <th className="p-3 sm:p-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {coupons.map((coupon) => (
                     <tr key={coupon.id} className="border-t">
-                      <td className="p-4 font-medium">{coupon.code}</td>
-                      <td className="p-4 capitalize">{coupon.discount_type}</td>
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4 font-medium">{coupon.code}</td>
+                      <td className="p-3 sm:p-4 capitalize">{coupon.discount_type}</td>
+                      <td className="p-3 sm:p-4">
                         {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : `RM${coupon.discount_value}`}
                       </td>
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4">
                         <span className={`px-2 py-1 rounded text-xs ${coupon.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                           {coupon.is_active ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="p-4">
+                      <td className="p-3 sm:p-4">
                         {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Never'}
                       </td>
-                      <td className="p-4 text-right">
+                      <td className="p-3 sm:p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Link href={`/admin/coupons/${coupon.id}/edit`}>
                             <Button variant="ghost" size="icon">

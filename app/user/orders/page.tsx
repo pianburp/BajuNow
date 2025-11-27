@@ -44,10 +44,10 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 sm:gap-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">My Orders</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">My Orders</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Track your order history and status
         </p>
       </div>
@@ -68,11 +68,11 @@ export default async function OrdersPage() {
           orders.map((order) => (
             <Card key={order.id}>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <div>
-                    <CardTitle className="text-lg">Order #{order.id.slice(0, 8)}</CardTitle>
-                    <CardDescription className="flex items-center gap-2 mt-1">
-                      <Calendar className="w-4 h-4" />
+                    <CardTitle className="text-base sm:text-lg">Order #{order.id.slice(0, 8)}</CardTitle>
+                    <CardDescription className="flex items-center gap-2 mt-1 text-xs sm:text-sm">
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                       {new Date(order.created_at).toLocaleDateString()}
                     </CardDescription>
                   </div>
@@ -85,16 +85,16 @@ export default async function OrdersPage() {
                 <div className="space-y-4">
                   <div className="border-t pt-4">
                     {order.order_items.map((item: any) => (
-                      <div key={item.id} className="flex justify-between py-2">
+                      <div key={item.id} className="flex flex-col sm:flex-row justify-between py-2 gap-1 sm:gap-0">
                         <div>
-                          <p className="font-medium">{item.product_name}</p>
-                          <p className="text-sm text-muted-foreground">{item.variant_info} x {item.quantity}</p>
+                          <p className="font-medium text-sm sm:text-base">{item.product_name}</p>
+                          <p className="text-xs sm:text-sm text-muted-foreground">{item.variant_info} x {item.quantity}</p>
                         </div>
-                        <p className="font-medium">RM{item.unit_price.toFixed(2)}</p>
+                        <p className="font-medium text-sm sm:text-base">RM{item.unit_price.toFixed(2)}</p>
                       </div>
                     ))}
                   </div>
-                  <div className="border-t pt-4 flex justify-between font-bold">
+                  <div className="border-t pt-4 flex justify-between font-bold text-sm sm:text-base">
                     <span>Total</span>
                     <span>RM{order.total_amount.toFixed(2)}</span>
                   </div>

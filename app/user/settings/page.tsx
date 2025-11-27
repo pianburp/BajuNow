@@ -13,10 +13,10 @@ export default async function SettingsPage() {
   }
 
   return (
-    <div className="container w-full py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-muted-foreground">
+    <div className="container w-full py-6 sm:py-10 px-0 sm:px-4">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Manage your account settings and preferences.
         </p>
       </div>
